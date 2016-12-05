@@ -12,8 +12,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import logtransaksi.LogDataBase;
 
 /**
  *
@@ -21,46 +24,22 @@ import javax.swing.table.DefaultTableModel;
  */
 public class CpControl {
     
+    private CPagenDB db;
+    /*
     Connection connection=null;
     Statement stmt;
     ResultSet rsCP;
     
     ArrayList<CPagenDB> list =new ArrayList<CPagenDB>();
     String[] title = {"No ID","Nama","No. Hp"};
-    int index = 0;
+    int index = 0;*/
     
     public CpControl(){
-        //initComponents();
-        
-        try {
-            connection=DriverManager.getConnection("jdbc:ucanaccess://"
-                    +"D:/E-Book/DDPL - Dasar Dasar Pengembangan Perangkat Lunak/INULCELL/inulcell.accdb;","","");
-            
-            System.out.println("berhasil connect");
-            
-            stmt= connection.createStatement();
-            rsCP=stmt.executeQuery("SELECT * FROM agen");
-            
-            while(rsCP.next()){
-                
-                list.add(new CPagenDB( //rsCP.getString("ID") ,
-                        rsCP.getString("Nama") ,
-                        rsCP.getString("NoHp")));
-            }
-        } catch (SQLException errMsg) {
-           System.out.println("ada kesalahan : "+ errMsg.getMessage());
-        }
-     //   updateTable();
-     //   showData();
+        db = new CPagenDB();
     }    
     
     public boolean tambah(String nama, String NoHp) { 
         String sql;
-        
-        CPagenDB newAgen = new CPagenDB();
-        newAgen.setNama(nama);
-        newAgen.setNohp(NoHp);
-        this.list.add(newAgen);
        
         sql = "INSERT INTO Agen (Nama, NoHp) VALUES"
                 +"('"+nama+"',"
@@ -68,17 +47,25 @@ public class CpControl {
         
         System.out.println(sql);
         
-        try{
-           int berhasil=stmt.executeUpdate(sql);    
-        } catch (SQLException errMsg) {
-           System.out.println("ada kesalahan : "+ errMsg.getMessage());
-        }
-        
-        //JOptionPane.showMessageDialog(this, "Data Tersimpan", "Informasi", JOptionPane.INFORMATION_MESSAGE);
-        return true; 
+        boolean tambah=db.tambah(sql);
+        return true;
     }
     
-    public void lihat(){ }
+    public Object[][] lihat(int index){ 
+       Object[][] data = new Object[15][5];
+        data = db.lihat(index);
+        return data;
+    }
     
-    public boolean hapus(String nama){ return true; } 
+    public boolean hapus(String id){ 
+        String sql="delete from agen "
+                +"where id='"+id+"'"; 
+        
+        boolean hapus=db.hapus(sql);
+        
+        if(hapus){
+            return true;
+        }
+        else return false; 
+    } 
 }
